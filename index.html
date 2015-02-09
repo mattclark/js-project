@@ -78,18 +78,25 @@ $(function() {
 
     var employeeTemplate = _.template($('#template-employee').html())
     var whoisTemplate = _.template($('#template-whois').html())
-
-    var crntGame;
-
+    var user = {
+        correctAttempts: 0,
+        incorrectAttempts: 0,
+        averageTime: 0
+    }
+    var timer;
 
     $('#face-wrapper').delegate('.employee', 'click', function() {
         var name = $(this).find('h2').text();
 
         if (name === crntGame.name) {
             $(this).find('.hidden').removeClass('hidden').addClass('right');
+            user.correctAttempts = user.correctAttempts + 1;
+            user.averageTime = ((Date.now() - timer) + user.averageTime) / 2;
+            alert("correct: " + user.correctAttempts + ", incorrect: " + user.incorrectAttempts + ", average: " + parseInt((user.averageTime / 1000), 10) + " seconds" );
             setTimeout(refresh, 2000);
         } else {
             $(this).find('.hidden').removeClass('hidden').addClass('wrong');
+            user.incorrectAttempts = user.incorrectAttempts + 1;
         }
     });
 
@@ -127,6 +134,7 @@ $(function() {
             });
             $('#question-wrapper').html(whoisTemplate(crntGame))
         });
+        timer = Date.now()
     }
 
     refresh();
