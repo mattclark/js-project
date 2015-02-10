@@ -33,7 +33,7 @@
 <script type="text/html" id="template-stats">
     <h1>Correct Attempts: {{ correctAttempts }}</h1>
     <h1>Incorrect Attempts: {{ incorrectAttempts }}</h1>
-    <h1>Average Time: {{ averageTime }}</h1>
+    <h1>Average Time: {{ averageTimeSeconds }}</h1>
 </script>
 
 
@@ -56,7 +56,8 @@ $(function() {
     var user = {
         correctAttempts: 0,
         incorrectAttempts: 0,
-        averageTime: 0
+        averageTime: 0,
+        averageTimeSeconds: 0
     }
     var timer;
 
@@ -68,6 +69,7 @@ $(function() {
             $(this).find('.hidden').removeClass('hidden').addClass('right');
             user.correctAttempts = user.correctAttempts + 1;
             user.averageTime = ((Date.now() - timer) + user.averageTime) / 2;
+            user.averageTimeSeconds = parseInt((user.averageTime / 1000), 10);
 //            alert("correct: " + user.correctAttempts + ", incorrect: " + user.incorrectAttempts + ", average: " + parseInt((user.averageTime / 1000), 10) + " seconds" );
             $('#question-wrapper').html(statsTemplate(user));
             setTimeout(refresh, 3000);
