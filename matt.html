@@ -1,0 +1,175 @@
+<!DOCTYPE HTML>
+<!--<!doctype html>-->
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7"><![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8"><![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9"><![endif]-->
+<!--[if gt IE 8]><!--><html class="no-js"><!--<![endif]-->
+
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800|Open+Sans+Condensed:300,300italic,700' rel='stylesheet' type='text/css'>
+<link href="/styles/styles.css" media="screen, projection" rel="stylesheet" type="text/css" />
+
+<!-- Markup -->
+<div id="app-wrapper">
+    <div id="nav-wrapper"></div>
+    <div id="question-wrapper"></div>
+    <div id="face-wrapper"></div>
+    <div id="stats-wrapper"></div>
+</div>
+
+
+<!-- Templates -->
+<script type="text/html" id="template-employee">
+    <article class="employee">
+        <img src="{{ url }}" />
+        <span class="name hidden">
+            <h2>{{ name }}</h2>
+        </span>
+    </article>
+</script>
+
+<script type="text/html" id="template-whois">
+    <h1>Who is {{ name }}?</h1>
+</script>
+
+<script type="text/html" id="template-stats">
+    <h1>Correct Attempts: {{ correctAttempts }}</h1>
+    <h1>Incorrect Attempts: {{ incorrectAttempts }}</h1>
+    <h1>Average Time: {{ averageTimeSeconds }}</h1>
+</script>
+
+<script type="text/html" id="template-nav">
+    <input id="homeButton" type="button" class="button" value="Home"/>
+    <input id="reverseButton" type="button" class="button" value="Reverse Mode"/>
+    <input id="mattButton" type="button" class="button" value="Mat(t) Mode"/>
+    <input id="newUser" type="button" class="button" value="New User"/>
+</script>
+
+
+<!-- Libs -->
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+
+
+<!-- Logic -->
+<script>
+
+$(function() {
+    _.templateSettings = {
+      interpolate: /\{\{(.+?)\}\}/g
+    };
+
+
+    var employeeTemplate = _.template($('#template-employee').html());
+    var whoisTemplate = _.template($('#template-whois').html());
+    var statsTemplate = _.template($('#template-stats').html());
+    var navTemplate = _.template($('#template-nav').html());
+    var user = {
+        correctAttempts: 0,
+        incorrectAttempts: 0,
+        averageTime: 0,
+        averageTimeSeconds: 0
+    };
+    var userArray = [];
+    var timer;
+
+    $('#nav-wrapper').html(navTemplate());
+
+    $('#face-wrapper').delegate('.employee', 'click', function() {
+        var name = $(this).find('h2').text();
+
+        if (name === crntGame.name) {
+            $(this).find('.hidden').removeClass('hidden').addClass('right');
+            user.correctAttempts = user.correctAttempts + 1;
+            user.averageTime = ((Date.now() - timer) + user.averageTime) / 2;
+            user.averageTimeSeconds = parseInt((user.averageTime / 1000), 10);
+//            alert("correct: " + user.correctAttempts + ", incorrect: " + user.incorrectAttempts + ", average: " + parseInt((user.averageTime / 1000), 10) + " seconds" );
+            $('#question-wrapper').html(statsTemplate(user));
+            setTimeout(refresh, 3000);
+        } else {
+            $(this).find('.hidden').removeClass('hidden').addClass('wrong');
+            user.incorrectAttempts = user.incorrectAttempts + 1;
+        }
+    });
+
+
+    function newUser() {
+        userArray.push(user);
+        setTimeout(refresh, 3000);
+    }
+
+    // http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+    function shuffle(array) {
+      var currentIndex = array.length, temporaryValue, randomIndex ;
+
+      // While there remain elements to shuffle...
+      while (0 !== currentIndex) {
+
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+
+        // And swap it with the current element.
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+      }
+
+      return array;
+    }
+
+    //http://stackoverflow.com/questions/9329446/for-each-over-an-array-in-javascript
+    if (typeof String.prototype.startsWith != 'function') {
+         String.prototype.startsWith = function (str){
+        return this.slice(0, str.length) == str;
+        };
+    }
+
+    var refresh = function() {
+        crntGame = false;
+        var $w = $('#face-wrapper');
+        $w.empty();
+
+        $.get('http://namegame.willowtreemobile.com:2000').then(function(data) {
+            var mattData = [];
+            data.forEach(function(entry) {
+                firstName = entry.name.split(" ")[0];
+                if (entry.name.startsWith("Mat")){
+                    mattData.push(entry);
+                }
+                data = mattData;
+//                console.log(entry);
+            });
+            data = mattData;
+            shuffle(data);
+            data = data.slice(0, 5);
+            crntGame = data[Math.floor(Math.random()*data.length)];
+            _.each(data, function(e) {
+                $w.append(employeeTemplate(e))
+            });
+            $('#question-wrapper').html(whoisTemplate(crntGame))
+        });
+        timer = Date.now()
+    };
+
+    refresh();
+
+    $("#reverseButton").click( function()
+           {
+             window.location.href = "reverse.html";
+           }
+    );
+    $("#mattButton").click( function()
+           {
+             window.location.href = "matt.html";
+           }
+    );
+    $("#homeButton").click( function()
+           {
+             window.location.href = "index.html";
+           }
+    );
+
+});
+
+</script>
+
