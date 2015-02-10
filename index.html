@@ -38,6 +38,8 @@
 </script>
 
 <script type="text/html" id="template-nav">
+    <input id="reverseButton" type="button" class="button" value="Reverse Mode"/>
+    <input id="mattButton" type="button" class="button" value="Mat(t) Mode"/>
     <input id="newUser" type="button" class="button" value="New User"/>
 </script>
 
@@ -133,6 +135,21 @@ $(function() {
 
     refresh();
 
+    $("#reverseButton").click( function()
+           {
+             window.location.href = "reverse.html";
+           }
+    );
+    $("#mattButton").click( function()
+           {
+             window.location.href = "matt.html";
+           }
+    );
+    $("#newUser").click( function()
+           {
+             newUser();
+           }
+    );
 
 });
 

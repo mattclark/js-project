@@ -10,7 +10,9 @@
 
 <!-- Markup -->
 <div id="app-wrapper">
+    <div id="nav-wrapper"></div>
     <div id="question-wrapper"></div>
+    <div id="stats-wrapper"></div>
     <div id="face-wrapper"></div>
 </div>
 
@@ -29,6 +31,17 @@
     <h1>Who is <img src="{{ url }}" />?</h1>
 </script>
 
+<script type="text/html" id="template-stats">
+    <h1>Correct Attempts: {{ correctAttempts }}</h1>
+    <h1>Incorrect Attempts: {{ incorrectAttempts }}</h1>
+    <h1>Average Time: {{ averageTimeSeconds }}</h1>
+</script>
+
+<script type="text/html" id="template-nav">
+    <input id="homeButton" type="button" class="button" value="Home"/>
+    <input id="reverseButton" type="button" class="button" value="Reverse Mode"/>
+    <input id="mattButton" type="button" class="button" value="Mat(t) Mode"/>
+</script>
 
 <!-- Libs -->
 <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -43,14 +56,19 @@ $(function() {
     };
 
 
-    var employeeTemplate = _.template($('#template-employee').html())
-    var whoisTemplate = _.template($('#template-whois').html())
+    var employeeTemplate = _.template($('#template-employee').html());
+    var whoisTemplate = _.template($('#template-whois').html());
+    var statsTemplate = _.template($('#template-stats').html());
+    var navTemplate = _.template($('#template-nav').html());
+
     var user = {
         correctAttempts: 0,
         incorrectAttempts: 0,
         averageTime: 0
     }
     var timer;
+
+    $('#nav-wrapper').html(navTemplate());
 
     $('#face-wrapper').delegate('.employee', 'click', function() {
         var name = $(this).find('h2').text();
@@ -59,7 +77,9 @@ $(function() {
             $(this).find('.hidden').removeClass('hidden').addClass('right');
             user.correctAttempts = user.correctAttempts + 1;
             user.averageTime = ((Date.now() - timer) + user.averageTime) / 2;
-            alert("correct: " + user.correctAttempts + ", incorrect: " + user.incorrectAttempts + ", average: " + parseInt((user.averageTime / 1000), 10) + " seconds" );
+            user.averageTimeSeconds = parseInt((user.averageTime / 1000), 10);
+//            alert("correct: " + user.correctAttempts + ", incorrect: " + user.incorrectAttempts + ", average: " + parseInt((user.averageTime / 1000), 10) + " seconds" );
+            $('#question-wrapper').html(statsTemplate(user));
             setTimeout(refresh, 2000);
         } else {
             $(this).find('.hidden').removeClass('hidden').addClass('wrong');
@@ -105,6 +125,22 @@ $(function() {
     }
 
     refresh();
+
+    $("#reverseButton").click( function()
+           {
+             window.location.href = "reverse.html";
+           }
+    );
+    $("#mattButton").click( function()
+           {
+             window.location.href = "matt.html";
+           }
+    );
+    $("#homeButton").click( function()
+           {
+             window.location.href = "index.html";
+           }
+    );
 
 });
 </script>
