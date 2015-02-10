@@ -14,6 +14,7 @@
     <div id="question-wrapper"></div>
     <div id="face-wrapper"></div>
     <div id="stats-wrapper"></div>
+    <div id="leaderboard-wrapper"></div>
 </div>
 
 
@@ -22,7 +23,7 @@
     <article class="employee">
         <img src="{{ url }}" />
         <span class="name hidden">
-            <h2>{{ name }}</h2>
+                <h2>{{ name }}</h2>
         </span>
     </article>
 </script>
@@ -44,6 +45,11 @@
 </script>
 
 
+<script type="text/html" id="template-leaderboard">
+    <h1>Leaderboard:</h1>
+    <h1>Loop Users Stats Here for Leaderboard</h1>
+</script>
+
 <!-- Libs -->
 <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
@@ -62,6 +68,7 @@ $(function() {
     var whoisTemplate = _.template($('#template-whois').html());
     var statsTemplate = _.template($('#template-stats').html());
     var navTemplate = _.template($('#template-nav').html());
+    var leaderboardTemplate = _.template($('#template-leaderboard').html());
     var user = {
         correctAttempts: 0,
         incorrectAttempts: 0,
@@ -93,6 +100,8 @@ $(function() {
 
     function newUser() {
         userArray.push(user);
+//        console.log(user);
+        $('#leaderboard-wrapper').html(leaderboardTemplate(userArray));
         setTimeout(refresh, 3000);
     }
 
