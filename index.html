@@ -73,10 +73,26 @@ $(function() {
         correctAttempts: 0,
         incorrectAttempts: 0,
         averageTime: 0,
-        averageTimeSeconds: 0
+        averageTimeSeconds: 0,
+        attemptArray: []
     };
     var userArray = [];
+    var attempt = {
+        incorrectAttempts: 0,
+        correctAttempts: 0,
+        timeForCorrect: 0
+    };
     var timer;
+
+    function averageAttemptArray(array) {
+        var sum = 0;
+            for( var i = 0; i < array.length; i++ ){
+                sum += parseInt( array[i].timeForCorrect, 10 );
+        }
+        avg = sum/array.length;
+        
+        return avg;
+    }
 
     $('#nav-wrapper').html(navTemplate());
 
@@ -85,18 +101,18 @@ $(function() {
 
         if (name === crntGame.name) {
             $(this).find('.hidden').removeClass('hidden').addClass('right');
-            user.correctAttempts = user.correctAttempts + 1;
-            user.averageTime = ((Date.now() - timer) + user.averageTime) / 2;
+            attempt.correctAttempts = attempt.correctAttempts +1;
+            attempt.timeForCorrect = Date.now() - timer;
+            user.attemptArray.push(attempt);
+            user.averageTime = averageAttemptArray(user.attemptArray);
             user.averageTimeSeconds = parseInt((user.averageTime / 1000), 10);
-//            alert("correct: " + user.correctAttempts + ", incorrect: " + user.incorrectAttempts + ", average: " + parseInt((user.averageTime / 1000), 10) + " seconds" );
             $('#question-wrapper').html(statsTemplate(user));
             setTimeout(refresh, 3000);
         } else {
             $(this).find('.hidden').removeClass('hidden').addClass('wrong');
-            user.incorrectAttempts = user.incorrectAttempts + 1;
+            attempt.incorrectAttempts = attempt.incorrectAttempts +1;
         }
     });
-
 
     function newUser() {
         userArray.push(user);
@@ -186,7 +202,6 @@ $(function() {
 
 });
 
-});
 
 </script>
 
