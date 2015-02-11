@@ -28,8 +28,21 @@
     </article>
 </script>
 
+<script type="text/html" id="template-employee-reverse">
+    <article class="employee">
+            <h1>{{ name }}</h1>
+        <span class="name hidden">
+            <h2>{{ name }}</h2>
+        </span>
+    </article>
+</script>
+
 <script type="text/html" id="template-whois">
     <h1>Who is {{ name }}?</h1>
+</script>
+
+<script type="text/html" id="template-whois-reverse">
+    <h1>Who is <img src="{{ url }}" />?</h1>
 </script>
 
 <script type="text/html" id="template-stats">
@@ -65,7 +78,9 @@ $(function() {
 
 
     var employeeTemplate = _.template($('#template-employee').html());
+    var employeeTemplateReverse = _.template($('#template-employee-reverse').html());
     var whoisTemplate = _.template($('#template-whois').html());
+    var whoisTemplateReverse = _.template($('#template-whois-reverse').html());
     var statsTemplate = _.template($('#template-stats').html());
     var navTemplate = _.template($('#template-nav').html());
     var leaderboardTemplate = _.template($('#template-leaderboard').html());
@@ -83,6 +98,8 @@ $(function() {
         timeForCorrect: 0
     };
     var timer;
+    var mattMode = false;
+    var reverseMode = false;
 
     function averageAttemptArray(array) {
         var sum = 0;
@@ -141,19 +158,51 @@ $(function() {
       return array;
     }
 
+    //http://stackoverflow.com/questions/9329446/for-each-over-an-array-in-javascript
+    if (typeof String.prototype.startsWith != 'function') {
+         String.prototype.startsWith = function (str){
+        return this.slice(0, str.length) == str;
+        };
+    }
+
+    function mattness(data) {
+        var mattData = [];
+                data.forEach(function(entry) {
+                    firstName = entry.name.split(" ")[0];
+                    if (entry.name.startsWith("Mat")){
+                        mattData.push(entry);
+                    }
+                    data = mattData;
+    //                console.log(entry);
+                });
+                return mattData;
+    }
+
     var refresh = function() {
         crntGame = false;
         var $w = $('#face-wrapper');
         $w.empty();
 
         $.get('http://namegame.willowtreemobile.com:2000').then(function(data) {
+            if (mattMode) {
+                data = mattness(data);
+            }
             shuffle(data);
             data = data.slice(0, 5);
             crntGame = data[Math.floor(Math.random()*data.length)];
             _.each(data, function(e) {
-                $w.append(employeeTemplate(e))
+                if (reverseMode){
+                    $w.append(employeeTemplateReverse(e))
+                } else {
+                    $w.append(employeeTemplate(e))
+                }
             });
-            $('#question-wrapper').html(whoisTemplate(crntGame))
+            if (reverseMode) {
+                $('#question-wrapper').html(whoisTemplateReverse(crntGame))
+            } else {
+                $('#question-wrapper').html(whoisTemplate(crntGame))
+            }
+            
         });
         timer = Date.now()
     };
@@ -162,12 +211,24 @@ $(function() {
 
     $("#reverseButton").click( function()
            {
-             window.location.href = "reverse.html";
+             if (reverseMode) {
+                   reverseMode = false;
+               } else {
+                   reverseMode = true;
+               }
+
+               refresh();
            }
     );
     $("#mattButton").click( function()
            {
-             window.location.href = "matt.html";
+               if (mattMode) {
+                   mattMode = false;
+               } else {
+                   mattMode = true;
+               }
+                   
+               refresh();
            }
     );
     $("#newUser").click( function()
