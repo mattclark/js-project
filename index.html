@@ -160,6 +160,32 @@ $(function() {
            }
     );
 
+    $(function(){
+    $('html').keydown(function(e){
+//        console.log(e.which);
+        switch(e.which) {
+            case 49:
+                $('article:eq(0)').click();
+                break;
+            case 50:
+                $('article:eq(1)').click();
+                break;
+            case 51:
+                $('article:eq(2)').click();
+                break;
+            case 52:
+                $('article:eq(3)').click();
+                break;
+            case 53:
+                $('article:eq(4)').click();
+                break;
+
+        }
+    });
+});
+
+});
+
 });
 
 </script>
